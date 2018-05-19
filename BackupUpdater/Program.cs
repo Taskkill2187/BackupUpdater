@@ -20,6 +20,13 @@ namespace BackupUpdater
         [STAThread]
         static void Main(string[] args)
         {
+            if (false) // debug
+            {
+                Console.WriteLine(DateTime.FromBinary(config.Default.lastDate));
+                Console.ReadLine();
+                return;
+            }
+
             Console.BufferHeight = 3000;
 
             FolderBrowserDialog InFolderD = new FolderBrowserDialog();
