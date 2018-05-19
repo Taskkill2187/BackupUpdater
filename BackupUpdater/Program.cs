@@ -15,6 +15,7 @@ namespace BackupUpdater
         static string OutputPath;
         static int Errors = 0;
         static int Overrides = 0;
+        static List<string> ErrorPaths = new List<string>();
 
         [STAThread]
         static void Main(string[] args)
@@ -23,11 +24,15 @@ namespace BackupUpdater
 
             FolderBrowserDialog InFolderD = new FolderBrowserDialog();
             InFolderD.Description = "Select the input Folder.";
+            InFolderD.RootFolder = Environment.SpecialFolder.Desktop;
+            InFolderD.SelectedPath = config.Default.lastInPath;
             DialogResult result = InFolderD.ShowDialog();
             if (result == DialogResult.OK)
             {
                 FolderBrowserDialog OutFolderD = new FolderBrowserDialog();
                 OutFolderD.Description = "Select the output/backup Folder.";
+                OutFolderD.RootFolder = Environment.SpecialFolder.Desktop;
+                OutFolderD.SelectedPath = config.Default.lastOutPath;
                 result = OutFolderD.ShowDialog();
                 if (result == DialogResult.OK)
                 {
@@ -38,10 +43,20 @@ namespace BackupUpdater
                         lastSaveTime = GetDate.ChoosenDate;
                         InputPath = InFolderD.SelectedPath;
                         OutputPath = OutFolderD.SelectedPath;
-
+                        
                         RecursiveFolderSearch(InFolderD.SelectedPath);
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Finished with " + Errors + " Errors and " + Overrides + " Overrides!");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Error paths:");
+                        for (int i = 0; i < ErrorPaths.Count; i++)
+                            Console.WriteLine(ErrorPaths[i]);
+
+                        config.Default.lastDate = DateTime.Now.ToBinary();
+                        config.Default.lastInPath = InputPath;
+                        config.Default.lastOutPath = OutputPath;
+                        config.Default.Save();
+
                         Console.ReadLine();
                     }
                 }
@@ -75,6 +90,7 @@ namespace BackupUpdater
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("ERROR: " + e.ToString() + " ERROR-PATH: " + StartDir);
+                ErrorPaths.Add(StartDir);
                 Console.ForegroundColor = ConsoleColor.White;
                 Errors++;
             }

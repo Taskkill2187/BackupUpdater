@@ -24,6 +24,11 @@ namespace BackupUpdater
         private void DateChooser_Load(object sender, EventArgs e)
         {
             picker = new DateTimePicker();
+            picker.Location = new Point(12, 12);
+            if (config.Default.lastDate == 0)
+                picker.Value = DateTime.Now;
+            else
+                picker.Value = DateTime.FromBinary(config.Default.lastDate);
             Controls.Add(picker);
         }
 
